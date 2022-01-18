@@ -1,5 +1,5 @@
 {
-    "name": "authlib",
+    "name": "@opendocs-editor/authlib",
     "version": "1.0.0",
     "description": "An easy authentication library for Node.js.",
     "main": "dist/index.js",
@@ -7,7 +7,6 @@
     "author": "Jacob Sapoznikow <jacob1coder@gmail.com>",
     "license": "MIT",
     "type": "commonjs",
-    "private": false,
     "keywords": [
         "authentication",
         "auth",
@@ -70,9 +69,9 @@
         ".npmignore",
         ".prettierignore",
         ".prettierrc.js",
-        "package.json",
         "README.md",
         "tsconfig.json",
         "yarn.lock"
-    ]
+    ],
+    "packageManager": "yarn@3.1.1"
 }
