@@ -32,6 +32,9 @@
         ".yarn",
         ".husky",
         ".pnp.cjs",
-        ".pnp.loader.mjs"
+        ".pnp.loader.mjs",
+        "node_modules/**/*.*",
+        "node_modules/*",
+        "node_modules/**/*"
     ]
 }

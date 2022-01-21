@@ -140,6 +140,38 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@opendocs-editor/authlib@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@opendocs-editor/authlib@workspace:."
+  dependencies:
+    "@node-minify/core": ^6.2.0
+    "@node-minify/google-closure-compiler": ^6.2.0
+    "@types/express": ^4.17.13
+    "@types/node": ^17.0.8
+    "@types/uuid": ^8.3.4
+    "@typescript-eslint/eslint-plugin": ^5.9.1
+    "@typescript-eslint/parser": ^5.9.1
+    adm-zip: ^0.5.9
+    axios: ^0.24.0
+    crypto: ^1.0.1
+    eslint: ^8.7.0
+    express: ^4.17.2
+    fs: ^0.0.1-security
+    google-auth-library: ^7.11.0
+    googleapis: ^92.0.0
+    mongodb: latest
+    nodemon: ^2.0.15
+    path: ^0.12.7
+    prettier: ^2.5.1
+    query-string: ^7.1.0
+    rimraf: ^3.0.2
+    tar: ^6.1.11
+    ts-node: ^10.4.0
+    typescript: ^4.5.4
+    uuid: ^8.3.2
+  languageName: unknown
+  linkType: soft
+
 "@sindresorhus/is@npm:^0.14.0":
   version: 0.14.0
   resolution: "@sindresorhus/is@npm:0.14.0"
@@ -260,13 +292,6 @@ __metadata:
   version: 17.0.8
   resolution: "@types/node@npm:17.0.8"
   checksum: f4cadeb9e602027520abc88c77142697e33cf6ac98bb02f8b595a398603cbd33df1f94d01c055c9f13cde0c8eaafc5e396ca72645458d42b4318b845bc7f1d0f
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:< 17.0.6":
-  version: 17.0.5
-  resolution: "@types/node@npm:17.0.5"
-  checksum: 105535e78722515c26cfdc1b0cbf1b19f55fe53b814e2e90d8b1e653bc63136d4760c7efc102eca111c6d124a291e37d60d761d569a3f4afb3fba05bad5d9ade
   languageName: node
   linkType: hard
 
@@ -640,38 +665,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"authlib@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "authlib@workspace:."
-  dependencies:
-    "@node-minify/core": ^6.2.0
-    "@node-minify/google-closure-compiler": ^6.2.0
-    "@types/express": ^4.17.13
-    "@types/node": ^17.0.8
-    "@types/uuid": ^8.3.4
-    "@typescript-eslint/eslint-plugin": ^5.9.1
-    "@typescript-eslint/parser": ^5.9.1
-    adm-zip: ^0.5.9
-    axios: ^0.24.0
-    crypto: ^1.0.1
-    eslint: ^8.7.0
-    express: ^4.17.2
-    fs: ^0.0.1-security
-    google-auth-library: ^7.11.0
-    googleapis: ^92.0.0
-    mongoose: ^6.1.6
-    nodemon: ^2.0.15
-    path: ^0.12.7
-    prettier: ^2.5.1
-    query-string: ^7.1.0
-    rimraf: ^3.0.2
-    tar: ^6.1.11
-    ts-node: ^10.4.0
-    typescript: ^4.5.4
-    uuid: ^8.3.2
-  languageName: unknown
-  linkType: soft
-
 "axios@npm:^0.24.0":
   version: 0.24.0
   resolution: "axios@npm:0.24.0"
@@ -762,7 +755,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bson@npm:^4.2.2, bson@npm:^4.6.0":
+"bson@npm:^4.6.1":
   version: 4.6.1
   resolution: "bson@npm:4.6.1"
   dependencies:
@@ -1116,7 +1109,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4, debug@npm:4.x, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2":
+"debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2":
   version: 4.3.3
   resolution: "debug@npm:4.3.3"
   dependencies:
@@ -2447,13 +2440,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"kareem@npm:2.3.3":
-  version: 2.3.3
-  resolution: "kareem@npm:2.3.3"
-  checksum: 6acbfeadce9b781844bfce6ecb8f721af2e6453c55e42d14bc9cf337cf4748bc4a084f915c4206e12d33f1c973f65d5010afb6e225b1f772a7b6e40e84da4efc
-  languageName: node
-  linkType: hard
-
 "keyv@npm:^3.0.0":
   version: 3.1.0
   resolution: "keyv@npm:3.1.0"
@@ -2734,54 +2720,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:4.2.2":
-  version: 4.2.2
-  resolution: "mongodb@npm:4.2.2"
+"mongodb@npm:latest":
+  version: 4.3.0
+  resolution: "mongodb@npm:4.3.0"
   dependencies:
-    bson: ^4.6.0
+    bson: ^4.6.1
     denque: ^2.0.1
     mongodb-connection-string-url: ^2.3.2
     saslprep: ^1.0.3
+    socks: ^2.6.1
   dependenciesMeta:
     saslprep:
       optional: true
-  checksum: 645cc8889ee093c0d6479638aa4f5b3e587b84be5179a35993f0796fda6b25d22c4b6f7d5f27b4d23c3aacb694db2ff696ea0a5080ddc745508ffff95131f3b5
-  languageName: node
-  linkType: hard
-
-"mongoose@npm:^6.1.6":
-  version: 6.1.6
-  resolution: "mongoose@npm:6.1.6"
-  dependencies:
-    "@types/node": < 17.0.6
-    bson: ^4.2.2
-    kareem: 2.3.3
-    mongodb: 4.2.2
-    mpath: 0.8.4
-    mquery: 4.0.0
-    ms: 2.1.2
-    regexp-clone: 1.0.0
-    sift: 13.5.2
-    sliced: 1.0.1
-  checksum: 15d6a151dfcb031f8e630a0deca575cb54d4cdc319c1376ed7e84b6d0a569dfa175d22088324d2b2f5d548d11a4fce81abf0691e29795556a67544dfb4803d81
-  languageName: node
-  linkType: hard
-
-"mpath@npm:0.8.4":
-  version: 0.8.4
-  resolution: "mpath@npm:0.8.4"
-  checksum: 06ad1d443766626fa361b67a4eca9cd4c36a71e475e92e8a5c242dbbc9a911adac00ce971177843b48475356df609f847342548da7701a976a2ab4116135caf0
-  languageName: node
-  linkType: hard
-
-"mquery@npm:4.0.0":
-  version: 4.0.0
-  resolution: "mquery@npm:4.0.0"
-  dependencies:
-    debug: 4.x
-    regexp-clone: ^1.0.0
-    sliced: 1.0.1
-  checksum: bfa776dfe67bb821a8199e02c01e51ca53020c552f3a7a137520e2ce3283b62ba05b50322d173d46f0e04b5eab0e2bdb5003e61019680e267c4776fe866b6306
+  checksum: c1772ebf1d78076e998817c9fc49bdcb8f2b006e88ca31fa72e2d8c4cfcc15e0ce5f545e3523e240d2706cf482faaa0443939799c6a0880ec19566fa7cea6fa6
   languageName: node
   linkType: hard
 
@@ -3257,13 +3208,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"regexp-clone@npm:1.0.0, regexp-clone@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "regexp-clone@npm:1.0.0"
-  checksum: ca4960bbdc4237c84813b12aed351606be7db60a8c8867ef46b44f00eec4e83f51b31de34e294900517db9d7a39636117af80916f6ce7dc45ea00cae3c6d6fc3
-  languageName: node
-  linkType: hard
-
 "regexpp@npm:^3.2.0":
   version: 3.2.0
   resolution: "regexpp@npm:3.2.0"
@@ -3495,13 +3439,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sift@npm:13.5.2":
-  version: 13.5.2
-  resolution: "sift@npm:13.5.2"
-  checksum: 31951836c464b995b25f888876dea9c58c7a3eaa419d2ed271776d55db2d1019c6438ee458047d3c16bc93f0a329366dc535dc3a6afc42038949dc2a6a548f61
-  languageName: node
-  linkType: hard
-
 "signal-exit@npm:^3.0.0, signal-exit@npm:^3.0.2":
   version: 3.0.6
   resolution: "signal-exit@npm:3.0.6"
@@ -3513,13 +3450,6 @@ __metadata:
   version: 3.0.0
   resolution: "slash@npm:3.0.0"
   checksum: 94a93fff615f25a999ad4b83c9d5e257a7280c90a32a7cb8b4a87996e4babf322e469c42b7f649fd5796edd8687652f3fb452a86dc97a816f01113183393f11c
-  languageName: node
-  linkType: hard
-
-"sliced@npm:1.0.1":
-  version: 1.0.1
-  resolution: "sliced@npm:1.0.1"
-  checksum: 84528d23279985ead75809eeec5d601b0fb6bc28348c6627f4feb40747533a1e36a75e8bc60f9079528079b21c434890b397e8fc5c24a649165cc0bbe90b4d70
   languageName: node
   linkType: hard
 

@@ -37,7 +37,7 @@
         "fs": "^0.0.1-security",
         "google-auth-library": "^7.11.0",
         "googleapis": "^92.0.0",
-        "mongoose": "^6.1.6",
+        "mongodb": "latest",
         "path": "^0.12.7",
         "query-string": "^7.1.0",
         "tar": "^6.1.11",

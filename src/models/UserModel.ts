@@ -1,16 +1,19 @@
-import mongoose from "mongoose";
+import mongodb from "mongodb";
 
-const schema = new mongoose.Schema({
-    name: String,
-    username: String,
-    email: String,
-    uuid: String,
-    credentials: {
-        hash: String,
-        salt: String,
-    },
-});
+interface UserPasswordCredentials {
+    hash: string;
+    salt: string;
+}
 
-const UserModel = mongoose.model("user", schema);
+class UserModel {
+    constructor(
+        public name?: string,
+        public username?: string,
+        public email?: string,
+        public uuid?: string,
+        public credentials?: UserPasswordCredentials,
+        public id?: mongodb.ObjectId
+    ) {}
+}
 
 export default UserModel;
