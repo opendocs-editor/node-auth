@@ -44,9 +44,9 @@
         "uuid": "^8.3.2"
     },
     "scripts": {
-        "start": "ts-node index.ts",
+        "start": "ts-node src/index.ts",
         "build": "yarn format && yarn fix && yarn clean && tsc -p . && node scripts/minify.js",
-        "dev": "nodemon index.ts",
+        "dev": "nodemon src/index.ts",
         "format": "prettier --write .",
         "fcheck": "prettier --check .",
         "clean": "rimraf dist min",

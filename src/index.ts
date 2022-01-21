@@ -20,8 +20,12 @@ const useAuth = async (
     app: express.Express,
     mongodbOptions?: MongoDBOptions
 ) => {
+    if (mongodbOptions && mongodbOptions.user)
+        mongodbOptions.user = encodeURIComponent(mongodbOptions.user);
+    if (mongodbOptions && mongodbOptions.pass)
+        mongodbOptions.pass = encodeURIComponent(mongodbOptions.pass);
     const dbclient = new mongodb.MongoClient(
-        `mongodb://${
+        `mongodb+srv://${
             mongodbOptions
                 ? `${
                       mongodbOptions.user && mongodbOptions.pass
@@ -43,10 +47,11 @@ const useAuth = async (
                                 : "27017")
                   }`
                 : "localhost:27017"
-        }`
+        }/?authMechanism=X.509&authenticationDatabase=admin`
     );
     try {
         await dbclient.connect();
+        await dbclient.db("admin").command({ ping: 1 });
         console.log(
             `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[42m\x1b[30m INFO \x1b[0m Connected!`
         );
@@ -76,4 +81,4 @@ const useAuth = async (
     }
 };
 
-useAuth(express());
+export default useAuth;
