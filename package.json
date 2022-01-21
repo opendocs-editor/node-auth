@@ -1,6 +1,6 @@
 {
     "name": "@opendocs-editor/authlib",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "An easy authentication library for Node.js.",
     "main": "dist/index.js",
     "repository": "https://github.com/opendocs-editor/node-auth",
