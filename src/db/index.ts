@@ -57,4 +57,22 @@ export class DatabaseManager {
             "The object supplied is not a DatabaseObjecct or a DatabaseObjectList!"
         );
     }
+
+    getObject(
+        searchObj: DatabaseObject
+    ): Promise<mongodb.WithId<mongodb.Document> | null> {
+        return this.client
+            .db(searchObj.database)
+            .collection(searchObj.collection)
+            .findOne(searchObj.data, {});
+    }
+
+    getMultipleObjects(
+        searchObj: DatabaseObject
+    ): mongodb.FindCursor<mongodb.WithId<mongodb.Document>> {
+        return this.client
+            .db(searchObj.database)
+            .collection(searchObj.collection)
+            .find(searchObj.data, {});
+    }
 }
