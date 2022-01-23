@@ -5,6 +5,14 @@ export interface PasswordHash {
     salt: string;
 }
 
+export const toPasswordHash = (hash: any): PasswordHash => {
+    const password: PasswordHash = {
+        hash: hash.hash,
+        salt: hash.salt,
+    };
+    return password;
+};
+
 export const hashPassword = (password: string): PasswordHash => {
     const salt = crypto.randomBytes(16).toString("hex");
     const hash = crypto

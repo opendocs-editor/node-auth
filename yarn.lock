@@ -140,13 +140,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opendocs-editor/authlib@1.0.1, @opendocs-editor/authlib@workspace:.":
+"@opendocs-editor/authlib@workspace:.":
   version: 0.0.0-use.local
   resolution: "@opendocs-editor/authlib@workspace:."
   dependencies:
     "@node-minify/core": ^6.2.0
     "@node-minify/google-closure-compiler": ^6.2.0
-    "@opendocs-editor/authlib": 1.0.1
+    "@types/body-parser": ^1.19.2
+    "@types/cookie-parser": ^1.4.2
     "@types/express": ^4.17.13
     "@types/node": ^17.0.8
     "@types/uuid": ^8.3.4
@@ -154,6 +155,8 @@ __metadata:
     "@typescript-eslint/parser": ^5.9.1
     adm-zip: ^0.5.9
     axios: ^0.24.0
+    body-parser: ^1.19.1
+    cookie-parser: ^1.4.6
     crypto: ^1.0.1
     eslint: ^8.7.0
     express: ^4.17.2
@@ -224,7 +227,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/body-parser@npm:*":
+"@types/body-parser@npm:*, @types/body-parser@npm:^1.19.2":
   version: 1.19.2
   resolution: "@types/body-parser@npm:1.19.2"
   dependencies:
@@ -243,6 +246,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/cookie-parser@npm:^1.4.2":
+  version: 1.4.2
+  resolution: "@types/cookie-parser@npm:1.4.2"
+  dependencies:
+    "@types/express": "*"
+  checksum: d5b3c0e193cc95289444306ad396b27b92c9ff1ffd0769268b374d09315c8df1ae94de5fe2a81a79c0629560646763136e15c8a4069d3dc5ba5cb6bc185eaccd
+  languageName: node
+  linkType: hard
+
 "@types/express-serve-static-core@npm:^4.17.18":
   version: 4.17.28
   resolution: "@types/express-serve-static-core@npm:4.17.28"
@@ -254,7 +266,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express@npm:^4.17.13":
+"@types/express@npm:*, @types/express@npm:^4.17.13":
   version: 4.17.13
   resolution: "@types/express@npm:4.17.13"
   dependencies:
@@ -703,7 +715,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"body-parser@npm:1.19.1":
+"body-parser@npm:1.19.1, body-parser@npm:^1.19.1":
   version: 1.19.1
   resolution: "body-parser@npm:1.19.1"
   dependencies:
@@ -1045,6 +1057,16 @@ __metadata:
   version: 1.0.4
   resolution: "content-type@npm:1.0.4"
   checksum: 3d93585fda985d1554eca5ebd251994327608d2e200978fdbfba21c0c679914d5faf266d17027de44b34a72c7b0745b18584ecccaa7e1fdfb6a68ac7114f12e0
+  languageName: node
+  linkType: hard
+
+"cookie-parser@npm:^1.4.6":
+  version: 1.4.6
+  resolution: "cookie-parser@npm:1.4.6"
+  dependencies:
+    cookie: 0.4.1
+    cookie-signature: 1.0.6
+  checksum: 1e5a63aa82e8eb4e02d2977c6902983dee87b02e87ec5ec43ac3cb1e72da354003716570cd5190c0ad9e8a454c9d3237f4ad6e2f16d0902205a96a1c72b77ba5
   languageName: node
   linkType: hard
 

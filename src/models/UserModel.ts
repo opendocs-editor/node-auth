@@ -12,7 +12,7 @@ class UserModel {
         public email?: string,
         public uuid?: string,
         public credentials?: UserPasswordCredentials,
-        public id?: mongodb.ObjectId
+        public _id?: mongodb.ObjectId
     ) {}
 }
 

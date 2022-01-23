@@ -1,5 +1,5 @@
 import * as uuid from "uuid";
-import UserModel from "src/models/UserModel";
+import UserModel from "../../models/UserModel";
 import * as crypto from "../security/crypto";
 
 export const createUser = (
