@@ -41,6 +41,11 @@ async function main() {
         //     console.error("An error occured: \n" + e);
         //     process.exit(1);
         // }
+        let filefolder = (minFolder + "/" + files[i]).split("/");
+        filefolder = filefolder.slice(0, -1);
+        filefolder = filefolder.join("/");
+        if (!fs.existsSync(filefolder))
+            fs.mkdirSync(filefolder, { recursive: true });
         fs.copyFileSync(folder + "/" + files[i], minFolder + "/" + files[i]);
         fs.copyFileSync(
             folder + "/" + files[i].replace(".js", ".d.ts"),

@@ -160,6 +160,7 @@ __metadata:
     crypto: ^1.0.1
     eslint: ^8.7.0
     express: ^4.17.2
+    final-fs: ^1.6.1
     fs: ^0.0.1-security
     google-auth-library: ^7.11.0
     googleapis: ^92.0.0
@@ -1630,6 +1631,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"final-fs@npm:^1.6.1":
+  version: 1.6.1
+  resolution: "final-fs@npm:1.6.1"
+  dependencies:
+    node-fs: ~0.1.5
+    when: ~2.0.1
+  checksum: 112db1b2f4a7584bb077456eb65958e3862d99a8984fd72fee559c82d6058b80b1189d5e19e074b506b989d6645db7fc6625999d9c510c1b87679de0325a4fba
+  languageName: node
+  linkType: hard
+
 "finalhandler@npm:~1.1.2":
   version: 1.1.2
   resolution: "finalhandler@npm:1.1.2"
@@ -2815,6 +2826,14 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-fs@npm:~0.1.5":
+  version: 0.1.7
+  resolution: "node-fs@npm:0.1.7"
+  checksum: 370917b2eb7ccb469801ae151b6b4162082ec4226ecf7ce0a7a0870e3b3bf67607fa2e0ef4b99ea8edd080821aef23b571a2774c02f2ee5742383e99c24cd837
+  conditions: (os=linux | os=darwin | os=freebsd | os=win32 | os=smartos | os=sunos)
+  languageName: node
+  linkType: hard
+
 "node-gyp@npm:latest":
   version: 8.4.1
   resolution: "node-gyp@npm:8.4.1"
@@ -3988,6 +4007,13 @@ __metadata:
     tr46: ~0.0.3
     webidl-conversions: ^3.0.0
   checksum: b8daed4ad3356cc4899048a15b2c143a9aed0dfae1f611ebd55073310c7b910f522ad75d727346ad64203d7e6c79ef25eafd465f4d12775ca44b90fa82ed9e2c
+  languageName: node
+  linkType: hard
+
+"when@npm:~2.0.1":
+  version: 2.0.1
+  resolution: "when@npm:2.0.1"
+  checksum: eced9cd44b5148f991152bb4ac414a48c04e24c6149103026f191a5d7f87d39721b013fc822b8e98f40466c5fee844ada3e231221d090cdaf6e84945a5f5192b
   languageName: node
   linkType: hard
 

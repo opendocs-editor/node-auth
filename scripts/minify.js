@@ -4,6 +4,7 @@ const minify = require("@node-minify/core");
 const gcc = require("@node-minify/google-closure-compiler");
 const AdmZip = require("adm-zip");
 const tar = require("tar");
+const ffs = require("final-fs");
 
 const folder = path.join(__dirname, "../dist");
 const minFolder = path.join(__dirname, "../min");
@@ -17,7 +18,7 @@ if (!fs.existsSync(minFolder)) fs.mkdirSync(minFolder);
 
 async function main() {
     console.log("Reading files...");
-    const files_ = fs.readdirSync(folder);
+    const files_ = ffs.readdirRecursiveSync(folder, true);
     const files = [];
     for (var i = 0; i < files_.length; i++) {
         if (files_[i].endsWith(".js") && !files_[i].includes(".min"))
@@ -43,15 +44,18 @@ async function main() {
         //     console.error("An error occured: \n" + e);
         //     process.exit(1);
         // }
+        let filefolder = (minFolder + "/" + files[i]).split("/");
+        filefolder = filefolder.slice(0, -1);
+        filefolder = filefolder.join("/");
+        if (!fs.existsSync(filefolder))
+            fs.mkdirSync(filefolder, { recursive: true });
         fs.copyFileSync(folder + "/" + files[i], minFolder + "/" + files[i]);
         fs.copyFileSync(
             folder + "/" + files[i].replace(".js", ".d.ts"),
             minFolder + "/" + files[i].replace(".js", ".d.ts")
         );
         const mapContent = JSON.parse(
-            fs.readFileSync(
-                minFolder + "/" + files[i].replace(".js", ".js.map")
-            )
+            fs.readFileSync(folder + "/" + files[i].replace(".js", ".js.map"))
         );
         mapContent.file = files[i];
         fs.writeFileSync(
