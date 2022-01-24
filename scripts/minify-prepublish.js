@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const minify = require("@node-minify/core");
+const ffs = require("final-fs");
 const gcc = require("@node-minify/google-closure-compiler");
 
 const folder = path.join(__dirname, "../dist");
@@ -15,7 +16,7 @@ if (!fs.existsSync(minFolder)) fs.mkdirSync(minFolder);
 
 async function main() {
     console.log("Reading files...");
-    const files_ = fs.readdirSync(folder);
+    const files_ = ffs.readdirRecursiveSync(folder, true);
     const files = [];
     for (var i = 0; i < files_.length; i++) {
         if (files_[i].endsWith(".js") && !files_[i].includes(".min"))
