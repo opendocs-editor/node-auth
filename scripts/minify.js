@@ -43,6 +43,7 @@ async function main() {
         //     console.error("An error occured: \n" + e);
         //     process.exit(1);
         // }
+        fs.copyFileSync(folder + "/" + files[i], minFolder + "/" + files[i]);
         fs.copyFileSync(
             folder + "/" + files[i].replace(".js", ".d.ts"),
             minFolder + "/" + files[i].replace(".js", ".d.ts")
