@@ -291,8 +291,8 @@ if (process.env.NODE_ENV == "development") {
         useAuth(
             app,
             "node_auth_testing",
-            "_fndslmoio3ikmpoeidsjflkjkbghk",
-            { user: "NoSadNile", pass: "n0sadn1l3" },
+            "REPLACE_ME",
+            {},
             { useGithubAuth: true, useGoogleAuth: true }
         );
 
