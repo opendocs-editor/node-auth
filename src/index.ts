@@ -14,6 +14,10 @@ interface MongoDBOptions {
     pass?: string;
 }
 
+export interface ErrorObject {
+    [key: string]: string;
+}
+
 interface AuthOptions {
     useGoogleAuth?: boolean;
     googleAuth?: {
@@ -127,7 +131,7 @@ const useAuth = async (
                 if (user) {
                     if (
                         crypto.checkPassword(
-                            crypto.toPasswordHash(user.credentials),
+                            crypto.toPasswordHash(user.credentials as object),
                             password
                         )
                     ) {
@@ -256,9 +260,11 @@ const useAuth = async (
         console.log(
             `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[42m\x1b[30m INFO \x1b[0m Set up!`
         );
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.log(
-            `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[41m\x1b[30m ERROR \x1b[0m \x1b[31mMongoDB Error:\x1b[0m \n\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[41m\x1b[30m ERROR \x1b[0m \x1b[36m>>\x1b[0m ${err.errmsg
+            `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[41m\x1b[30m ERROR \x1b[0m \x1b[31mMongoDB Error:\x1b[0m \n\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[41m\x1b[30m ERROR \x1b[0m \x1b[36m>>\x1b[0m ${(
+                err as ErrorObject
+            ).errmsg
                 .toString()
                 .replaceAll(
                     "\n",
@@ -272,28 +278,32 @@ const useAuth = async (
 };
 
 if (process.env.NODE_ENV == "development") {
-    const bodyParser = require("body-parser");
-    const cookieParser = require("cookie-parser");
+    const dev = async () => {
+        const bodyParser = await import("body-parser");
+        const cookieParser = await import("cookie-parser");
 
-    const app = express();
+        const app = express();
 
-    app.use(bodyParser.json({ extended: true }));
-    app.use(bodyParser.urlencoded({ extended: true }));
-    app.use(cookieParser());
+        app.use(bodyParser.json());
+        app.use(bodyParser.urlencoded({ extended: true }));
+        app.use(cookieParser.default());
 
-    useAuth(
-        app,
-        "node_auth_testing",
-        "_fndslmoio3ikmpoeidsjflkjkbghk",
-        { user: "NoSadNile", pass: "n0sadn1l3" },
-        { useGithubAuth: true, useGoogleAuth: true }
-    );
-
-    app.listen(8888, () => {
-        console.log(
-            `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[42m\x1b[30m INFO \x1b[0m Development server listening on port 8888!`
+        useAuth(
+            app,
+            "node_auth_testing",
+            "_fndslmoio3ikmpoeidsjflkjkbghk",
+            { user: "NoSadNile", pass: "n0sadn1l3" },
+            { useGithubAuth: true, useGoogleAuth: true }
         );
-    });
+
+        app.listen(8888, () => {
+            console.log(
+                `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[42m\x1b[30m INFO \x1b[0m Development server listening on port 8888!`
+            );
+        });
+    };
+
+    dev();
 }
 
 export default useAuth;

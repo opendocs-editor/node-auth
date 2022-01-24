@@ -5,10 +5,14 @@ export interface PasswordHash {
     salt: string;
 }
 
-export const toPasswordHash = (hash: any): PasswordHash => {
+export interface HashObjectConversion {
+    [key: string]: string;
+}
+
+export const toPasswordHash = (hash: object): PasswordHash => {
     const password: PasswordHash = {
-        hash: hash.hash,
-        salt: hash.salt,
+        hash: (hash as HashObjectConversion).hash,
+        salt: (hash as HashObjectConversion).salt,
     };
     return password;
 };

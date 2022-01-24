@@ -10,7 +10,7 @@ export class DatabaseObject {
     constructor(
         public database: string,
         public collection: string,
-        public data: any
+        public data: object
     ) {}
 }
 
@@ -18,7 +18,7 @@ export class DatabaseObjectList {
     constructor(
         public database: string,
         public collection: string,
-        public data: any[]
+        public data: object[]
     ) {}
 }
 
