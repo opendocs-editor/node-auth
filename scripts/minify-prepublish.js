@@ -53,7 +53,7 @@ async function main() {
         );
         const mapContent = JSON.parse(
             fs.readFileSync(
-                minFolder + "/" + files[i].replace(".js", ".js.map")
+                folder + "/" + files[i].replace(".js", ".js.map")
             )
         );
         mapContent.file = files[i];
