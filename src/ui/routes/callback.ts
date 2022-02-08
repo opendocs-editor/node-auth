@@ -1,12 +1,16 @@
 import express from "express";
-import * as UserCache from "../../db/usercache";
-import * as TokenCache from "../../tokens/tokencache";
 
 const callback = (
     req: express.Request,
-    res: express.Response,
-    userCache: UserCache.UserCacheType,
-    tokenCache: TokenCache.TokenCacheType
-) => {};
+    res: express.Response
+) => {
+    if (!req.query || !req.query.to) {
+        res.status(400);
+        res.type("application/json");
+        res.send({ code: 400, message: "Bad request." });
+        return;
+    }
+    return res.redirect(req.query.to as string);
+};
 
 export default callback;

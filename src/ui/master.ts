@@ -3,24 +3,22 @@ import callback from "./routes/callback";
 import login from "./routes/login";
 import register from "./routes/register";
 import * as UserCache from "../db/usercache";
-import * as TokenCache from "../tokens/tokencache";
 
 const init = (
     app: express.Express,
-    userCache: UserCache.UserCacheType,
-    tokenCache: TokenCache.TokenCacheType
+    userCache: UserCache.UserCacheType
 ) => {
     app.get("/api/auth/ui/local", (req, res) => {
         if (req.query && req.query.action) {
             switch (req.query.action) {
                 case "login":
-                    login(req, res, userCache, tokenCache);
+                    login(req, res, userCache);
                     break;
                 case "register":
-                    register(req, res, userCache, tokenCache);
+                    register(req, res, userCache);
                     break;
                 case "callback":
-                    callback(req, res, userCache, tokenCache);
+                    callback(req, res);
                     break;
                 default:
                     res.status(400);

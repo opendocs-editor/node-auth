@@ -9,7 +9,6 @@ import { createUser } from "./util/data/user";
 import * as crypto from "./util/security/crypto";
 import * as random from "./util/security/random";
 import uiRouteInit from "./ui/master";
-import { config } from "process";
 
 interface MongoDBOptions {
     host?: string;
@@ -266,7 +265,7 @@ const useAuth = async (
             }
         });
 
-        uiRouteInit(app, userCache, tokenCache);
+        uiRouteInit(app, userCache);
 
         app.get("/api/auth/*", (req, res) => {
             res.status(404);

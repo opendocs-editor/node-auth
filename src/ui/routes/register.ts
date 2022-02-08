@@ -1,12 +1,10 @@
 import express from "express";
 import * as UserCache from "../../db/usercache";
-import * as TokenCache from "../../tokens/tokencache";
 
 const register = async (
     req: express.Request,
     res: express.Response,
-    userCache: UserCache.UserCacheType,
-    tokenCache: TokenCache.TokenCacheType
+    userCache: UserCache.UserCacheType
 ) => {
     if (
         !req.query ||
@@ -14,7 +12,7 @@ const register = async (
         !req.query.password ||
         !req.query.name ||
         !req.query.email ||
-        !/.+\@.+\..+/gm.test(req.query.email as string)
+        !/.+@.+\..+/gm.test(req.query.email as string)
     ) {
         res.status(400);
         res.type("application/json");

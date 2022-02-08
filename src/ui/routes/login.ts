@@ -1,13 +1,11 @@
 import express from "express";
 import * as crypto from "../../util/security/crypto";
 import * as UserCache from "../../db/usercache";
-import * as TokenCache from "../../tokens/tokencache";
 
 const login = async (
     req: express.Request,
     res: express.Response,
-    userCache: UserCache.UserCacheType,
-    tokenCache: TokenCache.TokenCacheType
+    userCache: UserCache.UserCacheType
 ) => {
     if (!req.query || !req.query.username || !req.query.password) {
         res.status(400);
