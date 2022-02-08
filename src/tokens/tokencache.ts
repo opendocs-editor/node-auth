@@ -2,7 +2,18 @@ import * as database_ from "../db/index";
 import mongodb from "mongodb";
 import Token from "./Token";
 
-const TokenCache = async (database: string, client: mongodb.MongoClient) => {
+export interface TokenCacheType {
+    tokens: Token[];
+    getToken: (value: string) => Promise<Token | null>;
+    getTokenByHolder: (holder: string) => Promise<Token | null>;
+    getCachedToken: (value: string) => Token | null;
+    getCachedTokenByHolder: (holder: string) => Token | null;
+}
+
+const TokenCache = async (
+    database: string,
+    client: mongodb.MongoClient
+): Promise<TokenCacheType> => {
     const dbmanager = new database_.DatabaseManager(client);
 
     const tokens: Token[] = [];
@@ -24,7 +35,7 @@ const TokenCache = async (database: string, client: mongodb.MongoClient) => {
         );
     }
 
-    return {
+    const ret: TokenCacheType = {
         tokens,
 
         getToken: async (value: string): Promise<Token | null> => {
@@ -79,6 +90,7 @@ const TokenCache = async (database: string, client: mongodb.MongoClient) => {
             return null;
         },
     };
+    return ret;
 };
 
 export default TokenCache;

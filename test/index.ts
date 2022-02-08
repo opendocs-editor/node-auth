@@ -1,5 +1,6 @@
 import express from "express";
 import useAuth from "../src"; 
+import env from "./env";
 
 const dev = async () => {
     console.log(
@@ -18,14 +19,17 @@ const dev = async () => {
     await useAuth(
         app,
         "node_auth_testing",
-        "REPLACE_ME",
         {}, 
-        { useGithubAuth: true, useGoogleAuth: true }
+        {
+            useGithubAuth: true,
+            useGoogleAuth: true,
+            googleAuth: env
+        }
     );
 
-    app.listen(8080, () => {
+    app.listen(4502, () => {
         console.log(
-            `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[45m\x1b[30m DEV \x1b[0m \x1b[42m\x1b[30m INFO \x1b[0m Development server listening on port 8888!`
+            `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[45m\x1b[30m DEV \x1b[0m \x1b[42m\x1b[30m INFO \x1b[0m Development server listening on port 4502!`
         );
     });
 };

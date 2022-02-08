@@ -1,8 +1,27 @@
 import * as database_ from "./index";
 import mongodb from "mongodb";
 import UserModel from "../models/UserModel";
+import * as crypto from "../util/security/crypto";
+import * as uuid from "uuid";
 
-const UserCache = async (database: string, client: mongodb.MongoClient) => {
+export interface UserCacheType {
+    users: UserModel[];
+    getUser: (username: string) => Promise<UserModel | null>;
+    getUserByUUID: (uuid: string) => Promise<UserModel | null>;
+    getCachedUser: (username: string) => UserModel | null;
+    getCachedUserByUUID: (uuid: string) => UserModel | null;
+    createUser: (
+        name: string,
+        username: string,
+        email: string,
+        password: string
+    ) => Promise<UserModel>;
+}
+
+const UserCache = async (
+    database: string,
+    client: mongodb.MongoClient
+): Promise<UserCacheType> => {
     const dbmanager = new database_.DatabaseManager(client);
 
     const users: UserModel[] = [];
@@ -44,7 +63,7 @@ const UserCache = async (database: string, client: mongodb.MongoClient) => {
         );
     }
 
-    return {
+    const ret: UserCacheType = {
         users,
 
         getUser: async (username: string): Promise<UserModel | null> => {
@@ -130,7 +149,28 @@ const UserCache = async (database: string, client: mongodb.MongoClient) => {
             }
             return null;
         },
+
+        createUser: async (
+            name: string,
+            username: string,
+            email: string,
+            password: string
+        ): Promise<UserModel> => {
+            const user = new UserModel(
+                name,
+                username,
+                email,
+                uuid.v4(),
+                crypto.hashPassword(password)
+            );
+            const doc = await client
+                .db(database)
+                .collection("users")
+                .insertOne(user);
+            return user;
+        },
     };
+    return ret;
 };
 
 export default UserCache;

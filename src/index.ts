@@ -1,11 +1,15 @@
 import express from "express";
 import * as mongodb from "mongodb";
+import path from "path";
 import UserCache from "./db/usercache";
 import Token from "./tokens/Token";
 import TokenCache from "./tokens/tokencache";
+import init from "./util/auth/google";
 import { createUser } from "./util/data/user";
 import * as crypto from "./util/security/crypto";
 import * as random from "./util/security/random";
+import uiRouteInit from "./ui/master";
+import { config } from "process";
 
 interface MongoDBOptions {
     host?: string;
@@ -33,24 +37,33 @@ interface AuthOptions {
         scope?: string;
         accessToken?: string;
     };
+    /**
+     * The token for JsonWebToken to sign it's cookies with.
+     */
+    jwtSecret?: string;
     useInternalAuth?: boolean;
+    masterToken?: string;
 }
 
 const useAuth = async (
     app: express.Express,
     database: string,
-    masterToken: string,
     mongodbOptions?: MongoDBOptions,
     authOptions?: AuthOptions
 ) => {
     if (authOptions && authOptions.useGoogleAuth)
         console.log(
-            `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[43m\x1b[30m WARN \x1b[0m Google authentication has not been implemented yet. It will not be enabled.`
+            `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[43m\x1b[30m WARN \x1b[0m Google authentication is still a work in progress. You have been warned!`
         );
     if (authOptions && authOptions.useGithubAuth)
         console.log(
             `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[43m\x1b[30m WARN \x1b[0m GitHub authentication has not been implemented yet. It will not be enabled.`
         );
+    if (!authOptions?.masterToken) {
+        console.log(
+            `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[41m\x1b[30m ERROR \x1b[0m \x1b[31mThere was no master token provided. The app has been moved into development mode.`
+        );
+    }
     if (!mongodb) {
         console.log(
             `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[41m\x1b[30m ERROR \x1b[0m The MongoDB library import failed!`
@@ -106,10 +119,15 @@ const useAuth = async (
         let userCache = await UserCache(database, dbclient);
         let tokenCache = await TokenCache(database, dbclient);
 
+        app.set("view engine", "ejs");
+        app.set("views", path.join(__dirname, "../views"));
+
+        if (authOptions?.useGoogleAuth) init(app, authOptions);
+
         app.get("/api/auth/login/local", (req, res) => {
             res.status(405);
             res.type("application/json");
-            res.send({ error: 405, message: "405 Method not allowed." });
+            res.send({ code: 405, message: "405 Method not allowed." });
             return;
         });
 
@@ -122,7 +140,7 @@ const useAuth = async (
             ) {
                 res.status(400);
                 res.type("application/json");
-                res.send({ error: 400, message: "400 Bad request." });
+                res.send({ code: 400, message: "400 Bad request." });
                 return;
             }
             const token = req.body.token;
@@ -148,7 +166,7 @@ const useAuth = async (
                         res.status(403);
                         res.type("application/json");
                         res.send({
-                            error: 403,
+                            code: 403,
                             message: "403 Invalid password.",
                         });
                         return;
@@ -156,13 +174,13 @@ const useAuth = async (
                 } else {
                     res.status(406);
                     res.type("application/json");
-                    res.send({ error: 406, message: "406 Unknown user." });
+                    res.send({ code: 406, message: "406 Unknown user." });
                     return;
                 }
             } else {
                 res.status(403);
                 res.type("application/json");
-                res.send({ error: 403, message: "403 Invalid token." });
+                res.send({ code: 403, message: "403 Invalid token." });
                 return;
             }
         });
@@ -170,7 +188,7 @@ const useAuth = async (
         app.get("/api/auth/register/local", (req, res) => {
             res.status(405);
             res.type("application/json");
-            res.send({ error: 405, message: "405 Method not allowed." });
+            res.send({ code: 405, message: "405 Method not allowed." });
             return;
         });
 
@@ -185,7 +203,7 @@ const useAuth = async (
             ) {
                 res.status(400);
                 res.type("application/json");
-                res.send({ error: 400, message: "400 Bad request." });
+                res.send({ code: 400, message: "400 Bad request." });
                 return;
             }
             const token = req.body.token;
@@ -202,12 +220,12 @@ const useAuth = async (
                 res.status(200);
                 res.type("application/json");
                 delete user._id;
-                res.send(user);
+                res.send({ code: 200, message: user });
                 return;
             } else {
                 res.status(403);
                 res.type("application/json");
-                res.send({ error: 403, message: "403 Invalid token." });
+                res.send({ code: 403, message: "403 Invalid token." });
                 return;
             }
         });
@@ -215,7 +233,7 @@ const useAuth = async (
         app.get("/api/auth/token/create", (req, res) => {
             res.status(405);
             res.type("application/json");
-            res.send({ error: 405, message: "405 Method not allowed." });
+            res.send({ code: 405, message: "405 Method not allowed." });
             return;
         });
 
@@ -223,12 +241,12 @@ const useAuth = async (
             if (!req.body || !req.body.master || !req.body.holder) {
                 res.status(400);
                 res.type("application/json");
-                res.send({ error: 400, message: "400 Bad request." });
+                res.send({ code: 400, message: "400 Bad request." });
                 return;
             }
             const master = req.body.master;
             const holder = req.body.holder;
-            if (master === masterToken) {
+            if (master === authOptions?.masterToken) {
                 const token = new Token(random.randomString(50), holder);
                 await dbclient
                     .db(database)
@@ -238,26 +256,28 @@ const useAuth = async (
                 res.status(200);
                 res.type("application/json");
                 delete token._id;
-                res.send(token);
+                res.send({ code: 200, message: token });
                 return;
             } else {
                 res.status(403);
                 res.type("application/json");
-                res.send({ error: 403, message: "403 Invalid token." });
+                res.send({ code: 403, message: "403 Invalid token." });
                 return;
             }
         });
 
+        uiRouteInit(app, userCache, tokenCache);
+
         app.get("/api/auth/*", (req, res) => {
             res.status(404);
             res.type("application/json");
-            res.send({ error: 404, message: "404 Route Not Found" });
+            res.send({ code: 404, message: "404 Route Not Found" });
         });
 
         app.get("/api/auth", (req, res) => {
             res.status(404);
             res.type("application/json");
-            res.send({ error: 404, message: "404 Route Not Found" });
+            res.send({ code: 404, message: "404 Route Not Found" });
         });
 
         console.log(
@@ -278,7 +298,7 @@ const useAuth = async (
             res.status(500);
             res.type("application/json");
             res.send({
-                error: 500,
+                code: 500,
                 message:
                     "Could not connect to the database. Please try again soon.",
             });
@@ -287,7 +307,7 @@ const useAuth = async (
             res.status(500);
             res.type("application/json");
             res.send({
-                error: 500,
+                code: 500,
                 message:
                     "Could not connect to the database. Please try again soon.",
             });

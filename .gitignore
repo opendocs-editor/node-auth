@@ -7,3 +7,4 @@ min
 out
 push.sh
 .yarn
+test/env.ts

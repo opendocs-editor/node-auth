@@ -1,86 +1,93 @@
+import express from "express";
 import { google } from "googleapis";
-import { OAuth2Client } from "google-auth-library";
+import jwt from "jsonwebtoken";
 
-interface GoogleConfiguration {
-    clientId: string;
-    clientSecret: string;
-    redirect: string;
+interface GoogleAuthConfig {
+    /**
+     * Options for Google Auth.
+     */
+    googleAuth?: {
+        /**
+         * Google OAuth2 client ID.
+         */
+        clientId?: string;
+        /**
+         * Google OAuth2 client secret.
+         */
+        clientSecret?: string;
+        /**
+         * OAuth2 website base URL.
+         */
+        websiteBaseUrl?: string;
+    };
+    /**
+     * The token for JsonWebToken to sign it's cookies with.
+     */
+    jwtSecret?: string;
 }
 
-const config = (
-    clientId: string,
-    clientSecret: string,
-    websiteBaseUrl: string
-): GoogleConfiguration => {
-    const conf: GoogleConfiguration = {
-        clientId: clientId,
-        clientSecret: clientSecret,
-        redirect: `${websiteBaseUrl}${
-            websiteBaseUrl.endsWith("/") ? "" : "/"
-        }api/auth/google`,
-    };
-    return conf;
-};
+const OAuth2 = google.auth.OAuth2;
 
-const createConnection = (
-    clientId: string,
-    clientSecret: string,
-    websiteBaseUrl: string
-): OAuth2Client => {
-    return new google.auth.OAuth2(
-        config(clientId, clientSecret, websiteBaseUrl)
-    );
-};
+const init = (app: express.Express, config: GoogleAuthConfig) => {
+    if (
+        !config.googleAuth ||
+        !config.googleAuth.clientId ||
+        !config.googleAuth.clientSecret ||
+        !config.googleAuth.websiteBaseUrl
+    )
+        return;
 
-const defaultScope = [
-    "https://www.googleapis.com/auth/plus.me",
-    "https://www.googleapis.com/auth/userinfo.email",
-];
+    if (!config.jwtSecret) {
+        console.log(
+            `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[45m\x1b[30m GOOGLE \x1b[0m \x1b[41m\x1b[30m ERROR \x1b[0m \x1b[31mThere was no JWT secret provided. The app has been moved into development mode.`
+        );
+    }
 
-const createAuthUrl = (client: OAuth2Client): string => {
-    return client.generateAuthUrl({
-        access_type: "offline",
-        prompt: "consent",
-        scope: defaultScope,
+    app.get("/api/auth/login/google", (req, res) => {
+        const oauth2Client = new OAuth2(
+            config.googleAuth?.clientId,
+            config.googleAuth?.clientSecret,
+            (config.googleAuth?.websiteBaseUrl?.endsWith("/")
+                ? config.googleAuth?.websiteBaseUrl.slice(0, -1)
+                : config.googleAuth?.websiteBaseUrl) +
+                "/api/auth/callback/google"
+        );
+        const loginLink = oauth2Client.generateAuthUrl({
+            access_type: "offline",
+            scope: [
+                "https://www.googleapis.com/auth/userinfo.email",
+                "https://www.googleapis.com/auth/userinfo.profile",
+                "openid",
+            ],
+        });
+        return res.redirect(loginLink);
+    });
+
+    app.get("/api/auth/callback/google", (req, res) => {
+        const oauth2Client = new OAuth2(
+            config.googleAuth?.clientId,
+            config.googleAuth?.clientSecret,
+            config.googleAuth?.websiteBaseUrl + "/api/auth/callback/google"
+        );
+        if (req.query.error) {
+            return res.redirect("/api/auth/login/google");
+        } else {
+            const code = req.query.code as string;
+            if (!code) return res.redirect("/api/auth/login/google");
+            oauth2Client.getToken(code, function (err, token) {
+                if (err) return res.redirect("/api/auth/login/google");
+                res.cookie(
+                    "jwt",
+                    jwt.sign(
+                        token as string,
+                        config.jwtSecret ||
+                            "iaupjp3oiaksldoj3ihr0fojfkjhdfsjkghfjknds"
+                    )
+                );
+                return res.redirect("/get_some_data");
+            });
+        }
     });
 };
 
-const getGooglePlusApi = (client: OAuth2Client) => {
-    return google.plus({ version: "v1", auth: client });
-};
-
-const getAccountFromCode = async (
-    code: string,
-    client: OAuth2Client,
-    clientId: string,
-    clientSecret: string,
-    websiteBaseUrl: string
-) => {
-    const data = await client.getToken(code);
-    const tokens = data.tokens;
-    const auth = createConnection(
-        clientId,
-        clientSecret,
-        `${websiteBaseUrl}${
-            websiteBaseUrl.endsWith("/") ? "" : "/"
-        }api/auth/google`
-    );
-    auth.setCredentials(tokens);
-    const plus = getGooglePlusApi(auth);
-    const me = await plus.people.get({ userId: "me" });
-    const userGoogleId = me.data.id;
-    const userGoogleEmail =
-        me.data.emails && me.data.emails.length && me.data.emails[0].value;
-    return {
-        id: userGoogleId,
-        email: userGoogleEmail,
-        tokens: tokens,
-    };
-};
-
-export default {
-    create: createConnection,
-    createAuthUrl,
-    getGooglePlusApi,
-    getAccountFromCode,
-};
+export default init;
