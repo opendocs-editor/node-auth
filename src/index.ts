@@ -90,6 +90,9 @@ const useAuth = async (
         }`
     );
     try {
+        console.log(
+            `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[42m\x1b[30m INFO \x1b[0m Trying to connect to the database...`
+        );
         await dbclient.connect();
         await dbclient.db("admin").command({ ping: 1 });
 
@@ -103,14 +106,14 @@ const useAuth = async (
         let userCache = await UserCache(database, dbclient);
         let tokenCache = await TokenCache(database, dbclient);
 
-        app.get("/api/auth/signin/local", (req, res) => {
+        app.get("/api/auth/login/local", (req, res) => {
             res.status(405);
             res.type("application/json");
             res.send({ error: 405, message: "405 Method not allowed." });
             return;
         });
 
-        app.post("/api/auth/signin/local", async (req, res) => {
+        app.post("/api/auth/login/local", async (req, res) => {
             if (
                 !req.body ||
                 !req.body.user ||
@@ -271,39 +274,28 @@ const useAuth = async (
                     "\n\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[41m\x1b[30m ERROR \x1b[0m \x1b[36m>>\x1b[0m "
                 )}`
         );
+        app.all("/api/auth", (req, res) => {
+            res.status(500);
+            res.type("application/json");
+            res.send({
+                error: 500,
+                message:
+                    "Could not connect to the database. Please try again soon.",
+            });
+        });
+        app.all("/api/auth/*", (req, res) => {
+            res.status(500);
+            res.type("application/json");
+            res.send({
+                error: 500,
+                message:
+                    "Could not connect to the database. Please try again soon.",
+            });
+        });
         console.log(
             `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[41m\x1b[30m ERROR \x1b[0m Exiting...`
         );
     }
 };
-
-if (process.env.NODE_ENV == "development") {
-    const dev = async () => {
-        const bodyParser = await import("body-parser");
-        const cookieParser = await import("cookie-parser");
-
-        const app = express();
-
-        app.use(bodyParser.json());
-        app.use(bodyParser.urlencoded({ extended: true }));
-        app.use(cookieParser.default());
-
-        useAuth(
-            app,
-            "node_auth_testing",
-            "REPLACE_ME",
-            {},
-            { useGithubAuth: true, useGoogleAuth: true }
-        );
-
-        app.listen(8888, () => {
-            console.log(
-                `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[42m\x1b[30m INFO \x1b[0m Development server listening on port 8888!`
-            );
-        });
-    };
-
-    dev();
-}
 
 export default useAuth;

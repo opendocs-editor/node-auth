@@ -38,3 +38,5 @@ export const checkPassword = (
         .toString("hex");
     return hash.hash === newHash;
 };
+
+export default {};
