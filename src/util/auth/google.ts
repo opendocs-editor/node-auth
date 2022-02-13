@@ -16,7 +16,7 @@ interface GoogleAuthConfig {
          */
         clientSecret?: string;
         /**
-         * OAuth2 website base URL.
+         * Your website base URL.
          */
         websiteBaseUrl?: string;
     };
@@ -36,12 +36,6 @@ const init = (app: express.Express, config: GoogleAuthConfig) => {
         !config.googleAuth.websiteBaseUrl
     )
         return;
-
-    if (!config.jwtSecret) {
-        console.log(
-            `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[45m\x1b[30m GOOGLE \x1b[0m \x1b[41m\x1b[30m ERROR \x1b[0m \x1b[31mThere was no JWT secret provided. The app has been moved into development mode.`
-        );
-    }
 
     app.get("/api/auth/login/google", (req, res) => {
         const oauth2Client = new OAuth2(

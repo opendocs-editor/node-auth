@@ -4,10 +4,7 @@ import login from "./routes/login";
 import register from "./routes/register";
 import * as UserCache from "../db/usercache";
 
-const init = (
-    app: express.Express,
-    userCache: UserCache.UserCacheType
-) => {
+const init = (app: express.Express, userCache: UserCache.UserCacheType) => {
     app.get("/api/auth/ui/local", (req, res) => {
         if (req.query && req.query.action) {
             switch (req.query.action) {

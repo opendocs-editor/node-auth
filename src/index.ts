@@ -1,19 +1,45 @@
+/**
+ * Authlib
+ * Copyright (C) 2022 OpenDocs Editor
+ *
+ * https://opendocs-editor.github.io/authlib
+ * https://github.com/opendocs-editor/node-auth
+ *
+ * This project is licensed under the MIT license.
+ * Its dependencies have their own licenses. Please
+ * follow those licenses as well.
+ */
+
 import express from "express";
 import * as mongodb from "mongodb";
 import path from "path";
 import UserCache from "./db/usercache";
-import Token from "./tokens/Token";
 import TokenCache from "./tokens/tokencache";
-import init from "./util/auth/google";
-import { createUser } from "./util/data/user";
-import * as crypto from "./util/security/crypto";
-import * as random from "./util/security/random";
+import GoogleInit from "./util/auth/google";
+import LocalInit from "./util/auth/local";
+import TokenInit from "./util/auth/tokens";
 import uiRouteInit from "./ui/master";
 
-interface MongoDBOptions {
+export interface MongoDBOptions {
+    /**
+     * Host for the MongoDB server. Leave out the port and the http:// or https://.
+     * Defaults to: localhost
+     */
     host?: string;
+    /**
+     * Port of the MongoDB server.
+     * Defaults to: 27017
+     */
     port?: number;
+    /**
+     * User to authenticate to the MongoDB server as.
+     * Defaults to: None
+     */
     user?: string;
+    /**
+     * Password for authenticating to the MongoDB server.
+     * Defaults to: None
+     */
     pass?: string;
 }
 
@@ -21,26 +47,88 @@ export interface ErrorObject {
     [key: string]: string;
 }
 
-interface AuthOptions {
+export interface AuthOptions {
+    /**
+     * Whether or not to use Google Auth.
+     * Defaults to: false
+     */
     useGoogleAuth?: boolean;
+    /**
+     * Options for Google Auth.
+     * Defaults to: null
+     */
     googleAuth?: {
+        /**
+         * Google OAuth2 client ID.
+         * Defaults to: null
+         */
         clientId?: string;
+        /**
+         * Google OAuth2 client secret.
+         * Defaults to: null
+         */
         clientSecret?: string;
+        /**
+         * Your website base URL.
+         * Defaults to: null
+         */
         websiteBaseUrl?: string;
     };
+    /**
+     * Whether or not to use GitHub Auth.
+     * Defaults to: false
+     */
     useGithubAuth?: boolean;
+    /**
+     * Options for GitHub Auth.
+     * Defaults to: null
+     */
     githubAuth?: {
+        /**
+         * Google OAuth2 client ID.
+         * Defaults to: null
+         */
         clientId?: string;
+        /**
+         * Google OAuth2 client secret.
+         * Defaults to: null
+         */
         clientSecret?: string;
+        /**
+         * Your website base URL.
+         * Defaults to: null
+         */
         websiteBaseUrl?: string;
+        /**
+         * The OAuth2 scope.
+         * Defaults to: null
+         */
         scope?: string;
+        /**
+         * The access token for GitHub OAuth.
+         * Defaults to: null
+         */
         accessToken?: string;
     };
     /**
      * The token for JsonWebToken to sign it's cookies with.
+     * Defaults to: REPLACE_ME
      */
     jwtSecret?: string;
+    /**
+     * Whether or not to use the internal auth provider.
+     * Defaults to: true
+     */
     useInternalAuth?: boolean;
+    /**
+     * Whether or not to include the Auth UI.
+     * Defaults to: true
+     */
+    includeAuthUI?: boolean;
+    /**
+     * The master token to create other tokens with.
+     * Defaults to: REPLACE_ME
+     */
     masterToken?: string;
 }
 
@@ -50,6 +138,11 @@ const useAuth = async (
     mongodbOptions?: MongoDBOptions,
     authOptions?: AuthOptions
 ) => {
+    const bodyParser = await import("body-parser");
+    const cookieParser = await import("cookie-parser");
+
+    let isDev = process.env.NODE_ENV?.toLowerCase() == "development";
+
     if (authOptions && authOptions.useGoogleAuth)
         console.log(
             `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[43m\x1b[30m WARN \x1b[0m Google authentication is still a work in progress. You have been warned!`
@@ -58,10 +151,17 @@ const useAuth = async (
         console.log(
             `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[43m\x1b[30m WARN \x1b[0m GitHub authentication has not been implemented yet. It will not be enabled.`
         );
-    if (!authOptions?.masterToken) {
+    if (!authOptions?.masterToken || authOptions?.masterToken == "REPLACE_ME") {
         console.log(
             `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[41m\x1b[30m ERROR \x1b[0m \x1b[31mThere was no master token provided. The app has been moved into development mode.`
         );
+        isDev = true;
+    }
+    if (!authOptions?.jwtSecret || authOptions?.jwtSecret == "REPLACE_ME") {
+        console.log(
+            `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[41m\x1b[30m ERROR \x1b[0m \x1b[31mThere was no JWT secret provided. The app has been moved into development mode.`
+        );
+        isDev = true;
     }
     if (!mongodb) {
         console.log(
@@ -71,6 +171,11 @@ const useAuth = async (
             `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[41m\x1b[30m ERROR \x1b[0m Exiting...`
         );
         return;
+    }
+    if (isDev) {
+        console.log(
+            `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[43m\x1b[30m WARN \x1b[0m \x1b[33mThe app is in development mode. Some security features may be disabled. \x1b[0m`
+        );
     }
     if (mongodbOptions && mongodbOptions.user)
         mongodbOptions.user = encodeURIComponent(mongodbOptions.user);
@@ -112,8 +217,12 @@ const useAuth = async (
             `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[42m\x1b[30m INFO \x1b[0m Connected!`
         );
         console.log(
-            `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[42m\x1b[30m INFO \x1b[0m Setting up...`
+            `\x1b[46m\x1b[30m AUTHLIB \x1b[0m \x1b[42m\x1b[30m INFO \x1b[0m Setting up routes...`
         );
+
+        app.use(bodyParser.json());
+        app.use(bodyParser.urlencoded({ extended: true }));
+        app.use(cookieParser.default());
 
         let userCache = await UserCache(database, dbclient);
         let tokenCache = await TokenCache(database, dbclient);
@@ -121,151 +230,16 @@ const useAuth = async (
         app.set("view engine", "ejs");
         app.set("views", path.join(__dirname, "../views"));
 
-        if (authOptions?.useGoogleAuth) init(app, authOptions);
+        TokenInit(app, { dbclient, database, tokenCache }, authOptions);
 
-        app.get("/api/auth/login/local", (req, res) => {
-            res.status(405);
-            res.type("application/json");
-            res.send({ code: 405, message: "405 Method not allowed." });
-            return;
-        });
-
-        app.post("/api/auth/login/local", async (req, res) => {
-            if (
-                !req.body ||
-                !req.body.user ||
-                !req.body.pass ||
-                !req.body.token
-            ) {
-                res.status(400);
-                res.type("application/json");
-                res.send({ code: 400, message: "400 Bad request." });
-                return;
-            }
-            const token = req.body.token;
-            const username = req.body.user;
-            const password = req.body.pass;
-            const tkn = await tokenCache.getToken(token);
-            if (tkn) {
-                const user = await userCache.getUser(username);
-                if (user) {
-                    if (
-                        crypto.checkPassword(
-                            crypto.toPasswordHash(user.credentials as object),
-                            password
-                        )
-                    ) {
-                        res.status(200);
-                        res.type("application/json");
-                        delete user.credentials;
-                        delete user._id;
-                        res.send(user);
-                        return;
-                    } else {
-                        res.status(403);
-                        res.type("application/json");
-                        res.send({
-                            code: 403,
-                            message: "403 Invalid password.",
-                        });
-                        return;
-                    }
-                } else {
-                    res.status(406);
-                    res.type("application/json");
-                    res.send({ code: 406, message: "406 Unknown user." });
-                    return;
-                }
-            } else {
-                res.status(403);
-                res.type("application/json");
-                res.send({ code: 403, message: "403 Invalid token." });
-                return;
-            }
-        });
-
-        app.get("/api/auth/register/local", (req, res) => {
-            res.status(405);
-            res.type("application/json");
-            res.send({ code: 405, message: "405 Method not allowed." });
-            return;
-        });
-
-        app.post("/api/auth/register/local", async (req, res) => {
-            if (
-                !req.body ||
-                !req.body.name ||
-                !req.body.user ||
-                !req.body.pass ||
-                !req.body.email ||
-                !req.body.token
-            ) {
-                res.status(400);
-                res.type("application/json");
-                res.send({ code: 400, message: "400 Bad request." });
-                return;
-            }
-            const token = req.body.token;
-            const username = req.body.user;
-            const password = req.body.pass;
-            const name = req.body.name;
-            const email = req.body.email;
-            const tkn = await tokenCache.getToken(token);
-            if (tkn) {
-                const user = createUser(name, username, email, password);
-                await dbclient.db(database).collection("users").insertOne(user);
-                userCache = await UserCache(database, dbclient);
-                delete user.credentials;
-                res.status(200);
-                res.type("application/json");
-                delete user._id;
-                res.send({ code: 200, message: user });
-                return;
-            } else {
-                res.status(403);
-                res.type("application/json");
-                res.send({ code: 403, message: "403 Invalid token." });
-                return;
-            }
-        });
-
-        app.get("/api/auth/token/create", (req, res) => {
-            res.status(405);
-            res.type("application/json");
-            res.send({ code: 405, message: "405 Method not allowed." });
-            return;
-        });
-
-        app.post("/api/auth/token/create", async (req, res) => {
-            if (!req.body || !req.body.master || !req.body.holder) {
-                res.status(400);
-                res.type("application/json");
-                res.send({ code: 400, message: "400 Bad request." });
-                return;
-            }
-            const master = req.body.master;
-            const holder = req.body.holder;
-            if (master === authOptions?.masterToken) {
-                const token = new Token(random.randomString(50), holder);
-                await dbclient
-                    .db(database)
-                    .collection("tokens")
-                    .insertOne(token);
-                tokenCache = await TokenCache(database, dbclient);
-                res.status(200);
-                res.type("application/json");
-                delete token._id;
-                res.send({ code: 200, message: token });
-                return;
-            } else {
-                res.status(403);
-                res.type("application/json");
-                res.send({ code: 403, message: "403 Invalid token." });
-                return;
-            }
-        });
-
-        uiRouteInit(app, userCache);
+        if (authOptions?.useGoogleAuth) GoogleInit(app, authOptions);
+        if (authOptions?.useInternalAuth != false)
+            LocalInit(app, { dbclient, database, tokenCache, userCache });
+        if (
+            authOptions?.useInternalAuth != false &&
+            authOptions?.includeAuthUI != false
+        )
+            uiRouteInit(app, userCache);
 
         app.get("/api/auth/*", (req, res) => {
             res.status(404);

@@ -163,10 +163,7 @@ const UserCache = async (
                 uuid.v4(),
                 crypto.hashPassword(password)
             );
-            await client
-                .db(database)
-                .collection("users")
-                .insertOne(user);
+            await client.db(database).collection("users").insertOne(user);
             return user;
         },
     };

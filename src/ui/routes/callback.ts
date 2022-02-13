@@ -1,9 +1,6 @@
 import express from "express";
 
-const callback = (
-    req: express.Request,
-    res: express.Response
-) => {
+const callback = (req: express.Request, res: express.Response) => {
     if (!req.query || !req.query.to) {
         res.status(400);
         res.type("application/json");
