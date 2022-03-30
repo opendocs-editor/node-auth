@@ -224,8 +224,8 @@ const useAuth = async (
         app.use(bodyParser.urlencoded({ extended: true }));
         app.use(cookieParser.default());
 
-        let userCache = await UserCache(database, dbclient);
-        let tokenCache = await TokenCache(database, dbclient);
+        const userCache = await UserCache(database, dbclient);
+        const tokenCache = await TokenCache(database, dbclient);
 
         app.set("view engine", "ejs");
         app.set("views", path.join(__dirname, "../views"));
